@@ -184,14 +184,20 @@ const liveCall = async (request) => {
   if (!count)
     throw new ResponseError(400, "please provided valid tracking_token!");
   result.date = new Date();
-  result.status = true
+  await database.tracking.update({
+    data: {
+      status: true
+    },
+    where: {
+      id: result.tracking_id
+    }
+  })
   await database.live_tracking.update({
     data: result,
     where: {
       tracking_id: result.tracking_id,
     },
   });
-  delete result.status
   result.id = await generate.ohter_id();
   await database.history_tracking.create({
     data: result,
