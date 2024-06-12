@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { database } from "../app/database.js";
 import { generate } from "../app/id.js";
 import { Response } from "../app/response.js";
@@ -193,14 +194,27 @@ const liveCall = async (request) => {
     }
   })
   await database.live_tracking.update({
-    data: result,
+    data: {
+      tracking_id: result.tracking_id,
+      lat: new Prisma.Decimal(result.lat),
+      long: new Prisma.Decimal(result.long),
+      accuracy: new Prisma.Decimal(result.accuracy),
+      date: result.date
+    },
     where: {
       tracking_id: result.tracking_id,
     },
   });
   result.id = await generate.ohter_id();
   await database.history_tracking.create({
-    data: result,
+    data: {
+      id: result.id,
+      tracking_id: result.tracking_id,
+      lat: new Prisma.Decimal(result.lat),
+      long: new Prisma.Decimal(result.long),
+      accuracy: new Prisma.Decimal(result.accuracy),
+      date: result.date
+    },
   });
   return new Response(200, "success", null, null, false);
 };
